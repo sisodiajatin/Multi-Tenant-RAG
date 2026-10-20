@@ -4,3 +4,4 @@ psycopg[binary]
 pyjwt
 fastembed
 httpx  # for fastapi.testclient in tests
+anthropic
