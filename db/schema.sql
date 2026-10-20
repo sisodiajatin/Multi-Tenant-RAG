@@ -64,13 +64,14 @@ ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
 CREATE POLICY tenant_users ON users
     USING (tenant_id = app_tenant());
 
--- Documents/chunks: same tenant AND at least one shared role, for reads and writes.
+-- Documents/chunks: read if same tenant AND at least one shared role.
+-- Write only within your tenant, granting only roles you hold (no planting docs in HR's index).
 CREATE POLICY tenant_role_docs ON documents
     USING (tenant_id = app_tenant() AND allowed_roles && app_roles())
-    WITH CHECK (tenant_id = app_tenant());
+    WITH CHECK (tenant_id = app_tenant() AND allowed_roles <@ app_roles());
 CREATE POLICY tenant_role_chunks ON chunks
     USING (tenant_id = app_tenant() AND allowed_roles && app_roles())
-    WITH CHECK (tenant_id = app_tenant());
+    WITH CHECK (tenant_id = app_tenant() AND allowed_roles <@ app_roles());
 
 CREATE POLICY tenant_audit ON audit_log
     USING (tenant_id = app_tenant())
